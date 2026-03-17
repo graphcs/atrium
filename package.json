@@ -1,0 +1,14 @@
+{
+  "name": "atrium",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "dev:backend": "pnpm --filter @atrium/backend dev",
+    "dev:frontend": "pnpm --filter @atrium/frontend dev"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  }
+}
