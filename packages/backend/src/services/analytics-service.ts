@@ -5,6 +5,8 @@ export class AnalyticsService {
   getMetrics(): AuctionMetrics {
     const db = getDb();
 
+    // Note: bid_amount and clearing_price are stored as CPM (cost per 1000 impressions).
+    // Each row = one impression, so divide by 1000 to get actual per-impression cost.
     const totals = db.prepare(`
       SELECT
         COUNT(*) as total_requests,
@@ -14,7 +16,7 @@ export class AnalyticsService {
         SUM(CASE WHEN decision = 'no_bid' THEN 1 ELSE 0 END) as total_no_bids,
         AVG(CASE WHEN decision = 'bid' THEN bid_amount END) as avg_bid_price,
         AVG(CASE WHEN outcome = 'win' THEN clearing_price END) as avg_clearing_price,
-        SUM(CASE WHEN outcome = 'win' THEN clearing_price ELSE 0 END) as total_spend
+        SUM(CASE WHEN outcome = 'win' THEN clearing_price / 1000.0 ELSE 0 END) as total_spend
       FROM bid_logs
     `).get() as any;
 
@@ -32,7 +34,7 @@ export class AnalyticsService {
       avgBidPrice: totals.avg_bid_price || 0,
       avgClearingPrice: totals.avg_clearing_price || 0,
       totalSpend: totals.total_spend || 0,
-      avgCpm: totalWins > 0 ? (totals.total_spend / totalWins) : 0,
+      avgCpm: totals.avg_clearing_price || 0, // already in CPM units
       wasteRatio: totalBids > 0 ? (totals.total_losses / totalBids) : 0,
     };
   }
@@ -52,7 +54,7 @@ export class AnalyticsService {
           SUM(CASE WHEN decision = 'no_bid' THEN 1 ELSE 0 END) as total_no_bids,
           AVG(CASE WHEN decision = 'bid' THEN bid_amount END) as avg_bid_price,
           AVG(CASE WHEN outcome = 'win' THEN clearing_price END) as avg_clearing_price,
-          SUM(CASE WHEN outcome = 'win' THEN clearing_price ELSE 0 END) as total_spend
+          SUM(CASE WHEN outcome = 'win' THEN clearing_price / 1000.0 ELSE 0 END) as total_spend
         FROM bid_logs WHERE reseller = ?
       `).get(reseller) as any;
 
@@ -70,7 +72,7 @@ export class AnalyticsService {
         avgBidPrice: totals.avg_bid_price || 0,
         avgClearingPrice: totals.avg_clearing_price || 0,
         totalSpend: totals.total_spend || 0,
-        avgCpm: totalWins > 0 ? (totals.total_spend / totalWins) : 0,
+        avgCpm: totals.avg_clearing_price || 0,
         wasteRatio: totalBids > 0 ? (totals.total_losses / totalBids) : 0,
       };
     }
