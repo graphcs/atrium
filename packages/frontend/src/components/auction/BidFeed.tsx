@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useAuctionStore } from '../../stores/auction-store';
+import { Pause } from 'lucide-react';
 import clsx from 'clsx';
 
 export default function BidFeed() {
@@ -14,100 +15,128 @@ export default function BidFeed() {
   }, [bids, paused]);
 
   return (
-    <div className="glass-panel flex flex-col h-full animate-fade-in relative scan-overlay">
-      <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.04]">
-        <span className="text-[10px] font-mono text-gray-500 tracking-[0.15em] uppercase">
-          Live Bid Feed
-        </span>
-        <span className="text-[10px] font-mono text-gray-600">
-          {bids.length} entries
-        </span>
+    <div className="card flex flex-col h-full animate-fade-in relative">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
+        <div className="flex items-center gap-3">
+          <span className="section-label">Live Bid Feed</span>
+          {bids.length > 0 && (
+            <span className="tag bg-surface-2 text-txt-3 border border-border">
+              {bids.length} entries
+            </span>
+          )}
+        </div>
+        {paused && (
+          <span className="flex items-center gap-1.5 text-xs font-display text-warning">
+            <Pause className="w-3 h-3" />
+            Paused
+          </span>
+        )}
       </div>
 
+      {/* Feed */}
       <div
         ref={containerRef}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
-        className="flex-1 overflow-y-auto min-h-0 divide-y divide-white/[0.02]"
+        className="flex-1 overflow-y-auto min-h-0"
       >
         {bids.length === 0 ? (
-          <div className="flex items-center justify-center h-40 text-gray-600 font-mono text-xs">
-            No bids yet. Start the simulator.
+          <div className="flex flex-col items-center justify-center h-40 text-center px-4">
+            <p className="text-txt-2 font-display text-sm">No bids yet</p>
+            <p className="text-txt-3 font-display text-xs mt-1">
+              Start the simulator to see real-time bid activity
+            </p>
           </div>
         ) : (
-          bids.slice(0, 100).map((bid) => {
-            const isWin = bid.outcome === 'win';
-            const isLoss = bid.outcome === 'loss';
-            const isBid = bid.decision === 'bid';
+          <table className="w-full text-xs font-mono">
+            <thead className="sticky top-0 bg-surface-1 z-10">
+              <tr className="text-txt-3 border-b border-border">
+                <th className="px-4 py-2.5 text-left font-medium w-8"></th>
+                <th className="px-4 py-2.5 text-left font-medium">Source</th>
+                <th className="px-4 py-2.5 text-left font-medium">Action</th>
+                <th className="px-4 py-2.5 text-right font-medium">Bid</th>
+                <th className="px-4 py-2.5 text-right font-medium">Floor</th>
+                <th className="px-4 py-2.5 text-right font-medium">Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bids.slice(0, 100).map((bid) => {
+                const isWin = bid.outcome === 'win';
+                const isLoss = bid.outcome === 'loss';
+                const isBid = bid.decision === 'bid';
 
-            return (
-              <div
-                key={bid.id}
-                className={clsx(
-                  'px-5 py-2.5 flex items-center gap-3 text-[11px] font-mono transition-colors animate-slide-in-right',
-                  isWin && 'bg-neon-green/[0.03]',
-                  isLoss && 'bg-neon-red/[0.02]',
-                )}
-              >
-                {/* Status dot */}
-                <div
-                  className={clsx(
-                    'w-1.5 h-1.5 rounded-full shrink-0',
-                    isWin && 'bg-neon-green shadow-[0_0_4px_rgba(16,185,129,0.5)]',
-                    isLoss && 'bg-neon-red shadow-[0_0_4px_rgba(244,63,94,0.5)]',
-                    !isBid && 'bg-gray-600',
-                    isBid && !isWin && !isLoss && 'bg-neon-amber',
-                  )}
-                />
+                return (
+                  <tr
+                    key={bid.id}
+                    className={clsx(
+                      'border-b border-border/30 transition-colors animate-slide-in',
+                      isWin && 'bg-success-subtle',
+                      isLoss && 'bg-danger-subtle',
+                    )}
+                  >
+                    {/* Status indicator */}
+                    <td className="px-4 py-2">
+                      <div
+                        className={clsx(
+                          'w-2 h-2 rounded-full',
+                          isWin && 'bg-success',
+                          isLoss && 'bg-danger',
+                          !isBid && 'bg-txt-3',
+                          isBid && !isWin && !isLoss && 'bg-warning',
+                        )}
+                      />
+                    </td>
 
-                {/* Reseller */}
-                <span className="text-gray-500 w-14 shrink-0 truncate">{bid.reseller}</span>
+                    {/* Reseller */}
+                    <td className="px-4 py-2 text-txt-2 truncate max-w-[100px]">{bid.reseller}</td>
 
-                {/* Decision */}
-                <span
-                  className={clsx(
-                    'data-tag shrink-0',
-                    isBid ? 'bg-atrium-500/10 text-atrium-400' : 'bg-gray-500/10 text-gray-600',
-                  )}
-                >
-                  {isBid ? 'BID' : 'SKIP'}
-                </span>
+                    {/* Decision */}
+                    <td className="px-4 py-2">
+                      <span className={clsx(
+                        'tag border',
+                        isBid
+                          ? 'bg-accent-subtle text-accent border-accent-border'
+                          : 'bg-surface-2 text-txt-3 border-border',
+                      )}>
+                        {isBid ? 'BID' : 'SKIP'}
+                      </span>
+                    </td>
 
-                {/* Price */}
-                {bid.bidAmount ? (
-                  <span className="text-gray-300 w-16 text-right shrink-0">
-                    ${bid.bidAmount.toFixed(2)}
-                  </span>
-                ) : (
-                  <span className="text-gray-700 w-16 text-right shrink-0">—</span>
-                )}
+                    {/* Bid amount */}
+                    <td className="px-4 py-2 text-right text-txt-1">
+                      {bid.bidAmount ? `$${bid.bidAmount.toFixed(2)}` : <span className="text-txt-3">&mdash;</span>}
+                    </td>
 
-                {/* Floor */}
-                <span className="text-gray-600 w-16 text-right shrink-0">
-                  {bid.floorPrice ? `$${bid.floorPrice.toFixed(2)}` : '—'}
-                </span>
+                    {/* Floor price */}
+                    <td className="px-4 py-2 text-right text-txt-3">
+                      {bid.floorPrice ? `$${bid.floorPrice.toFixed(2)}` : <span>&mdash;</span>}
+                    </td>
 
-                {/* Outcome */}
-                <span
-                  className={clsx(
-                    'ml-auto data-tag shrink-0',
-                    isWin && 'bg-neon-green/10 text-neon-green',
-                    isLoss && 'bg-neon-red/10 text-neon-red',
-                    !isBid && 'bg-transparent text-gray-700',
-                    isBid && !isWin && !isLoss && 'bg-neon-amber/10 text-neon-amber',
-                  )}
-                >
-                  {isWin ? 'WIN' : isLoss ? 'LOSS' : isBid ? 'PEND' : (bid.filterReason ?? 'skip')}
-                </span>
-              </div>
-            );
-          })
+                    {/* Outcome */}
+                    <td className="px-4 py-2 text-right">
+                      <span className={clsx(
+                        'tag border',
+                        isWin && 'bg-success-subtle text-success border-success-border',
+                        isLoss && 'bg-danger-subtle text-danger border-danger-border',
+                        !isBid && 'text-txt-3',
+                        isBid && !isWin && !isLoss && 'bg-warning-subtle text-warning border-warning-border',
+                      )}>
+                        {isWin ? 'WIN' : isLoss ? 'LOSS' : isBid ? 'PENDING' : (bid.filterReason ?? 'skip')}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
       </div>
 
-      {paused && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-void-100/90 border border-white/[0.06] rounded-full px-3 py-1 text-[10px] font-mono text-gray-400">
-          Scroll paused — move mouse away to resume
+      {/* Pause overlay indicator */}
+      {paused && bids.length > 0 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-surface-2 border border-border rounded-full px-4 py-1.5 text-xs font-display text-txt-2 shadow-lg">
+          Hover to pause &middot; move mouse away to resume
         </div>
       )}
     </div>

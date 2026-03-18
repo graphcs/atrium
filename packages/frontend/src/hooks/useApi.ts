@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-const BASE = '/api';
+const BASE = `${import.meta.env.VITE_API_URL || ''}/api`;
 
 export function useApi() {
   const [loading, setLoading] = useState(false);

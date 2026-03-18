@@ -20,31 +20,26 @@ export default function Campaigns() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Header title="Campaigns" />
+      <Header title="Campaigns" subtitle="Configure and manage your ad campaigns" />
 
-      <div className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <p className="text-sm text-gray-500 font-mono">
-              {campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="btn-glow btn-glow-blue flex items-center gap-2"
-          >
+      <div className="flex-1 p-6">
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-sm text-txt-2 font-display">
+            {campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}
+          </p>
+          <button onClick={() => setShowForm(true)} className="btn-primary">
             <Plus className="w-4 h-4" />
             New Campaign
           </button>
         </div>
 
         {campaigns.length === 0 ? (
-          <div className="glass-panel p-16 text-center animate-fade-in">
-            <div className="text-gray-600 font-mono text-sm mb-4">No campaigns yet</div>
-            <button
-              onClick={() => setShowForm(true)}
-              className="btn-glow btn-glow-blue inline-flex items-center gap-2"
-            >
+          <div className="card p-16 text-center animate-fade-in">
+            <p className="text-txt-2 font-display text-sm mb-1">No campaigns yet</p>
+            <p className="text-txt-3 font-display text-xs mb-5">
+              Campaigns define your bidding strategy, budget, and targeting rules
+            </p>
+            <button onClick={() => setShowForm(true)} className="btn-primary">
               <Plus className="w-4 h-4" />
               Create your first campaign
             </button>

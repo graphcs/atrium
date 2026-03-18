@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: atrium-backend
+    runtime: node
+    plan: free
+    buildCommand: pnpm install && pnpm --filter @atrium/shared build || true
+    startCommand: pnpm --filter @atrium/backend dev
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+    rootDir: .

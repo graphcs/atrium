@@ -48,12 +48,18 @@ export default function CampaignForm({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="glass-panel w-full max-w-lg max-h-[80vh] overflow-y-auto m-4 animate-slide-up">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in">
+      <div className="card w-full max-w-lg max-h-[80vh] overflow-y-auto m-4 animate-slide-up">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-white/[0.04]">
-          <h2 className="font-display font-bold text-lg text-white">New Campaign</h2>
-          <button onClick={onClose} className="p-1.5 rounded-md hover:bg-white/[0.06] text-gray-500 hover:text-gray-300 transition-colors">
+        <div className="flex items-center justify-between p-5 border-b border-border">
+          <div>
+            <h2 className="font-display font-bold text-lg text-txt-1">New Campaign</h2>
+            <p className="text-xs text-txt-3 font-display mt-0.5">Set up your bidding parameters</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-surface-2 text-txt-3 hover:text-txt-1 transition-colors cursor-pointer"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -65,8 +71,8 @@ export default function CampaignForm({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Q1 Brand Awareness"
-              className="w-full bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm font-mono text-white placeholder:text-gray-600 focus:outline-none focus:border-atrium-500/30 focus:ring-1 focus:ring-atrium-500/10 transition-colors"
+              placeholder="e.g. Q1 Brand Awareness"
+              className="input-field"
             />
           </Field>
 
@@ -91,10 +97,10 @@ export default function CampaignForm({
                   key={g}
                   onClick={() => toggleItem(geos, g, setGeos)}
                   className={clsx(
-                    'data-tag cursor-pointer transition-colors',
+                    'tag cursor-pointer transition-colors border',
                     geos.includes(g)
-                      ? 'bg-atrium-500/20 text-atrium-400 border border-atrium-500/20'
-                      : 'bg-white/[0.03] text-gray-500 border border-transparent hover:bg-white/[0.06]',
+                      ? 'bg-accent-subtle text-accent border-accent-border'
+                      : 'bg-surface-2 text-txt-3 border-border hover:border-border-light hover:text-txt-2',
                   )}
                 >
                   {g}
@@ -111,10 +117,10 @@ export default function CampaignForm({
                   key={d}
                   onClick={() => toggleItem(devices, d, setDevices)}
                   className={clsx(
-                    'data-tag cursor-pointer transition-colors',
+                    'tag cursor-pointer transition-colors border',
                     devices.includes(d)
-                      ? 'bg-neon-green/15 text-neon-green border border-neon-green/20'
-                      : 'bg-white/[0.03] text-gray-500 border border-transparent hover:bg-white/[0.06]',
+                      ? 'bg-success-subtle text-success border-success-border'
+                      : 'bg-surface-2 text-txt-3 border-border hover:border-border-light hover:text-txt-2',
                   )}
                 >
                   {d}
@@ -131,10 +137,10 @@ export default function CampaignForm({
                   key={c}
                   onClick={() => toggleItem(categories, c, setCategories)}
                   className={clsx(
-                    'data-tag cursor-pointer transition-colors',
+                    'tag cursor-pointer transition-colors border',
                     categories.includes(c)
-                      ? 'bg-neon-cyan/15 text-neon-cyan border border-neon-cyan/20'
-                      : 'bg-white/[0.03] text-gray-500 border border-transparent hover:bg-white/[0.06]',
+                      ? 'bg-accent-subtle text-accent border-accent-border'
+                      : 'bg-surface-2 text-txt-3 border-border hover:border-border-light hover:text-txt-2',
                   )}
                 >
                   {c}
@@ -145,14 +151,14 @@ export default function CampaignForm({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 p-5 border-t border-white/[0.04]">
-          <button onClick={onClose} className="btn-glow btn-glow-neutral">
+        <div className="flex justify-end gap-2 p-5 border-t border-border">
+          <button onClick={onClose} className="btn-ghost">
             Cancel
           </button>
           <button
             onClick={submit}
             disabled={!name.trim()}
-            className={clsx('btn-glow btn-glow-blue', !name.trim() && 'opacity-40 cursor-not-allowed')}
+            className="btn-primary"
           >
             Create Campaign
           </button>
@@ -165,9 +171,7 @@ export default function CampaignForm({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-[10px] font-mono text-gray-500 tracking-[0.1em] uppercase mb-2 block">
-        {label}
-      </label>
+      <label className="section-label mb-2 block">{label}</label>
       {children}
     </div>
   );
@@ -188,7 +192,7 @@ function NumberInput({
       value={value}
       step={step}
       onChange={(e) => onChange(Number(e.target.value))}
-      className="w-full bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-atrium-500/30 focus:ring-1 focus:ring-atrium-500/10 transition-colors"
+      className="input-field"
     />
   );
 }

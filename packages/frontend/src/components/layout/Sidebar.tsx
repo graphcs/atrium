@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Megaphone, Radio, Zap } from 'lucide-react';
+import { LayoutDashboard, Megaphone, Radio, Activity } from 'lucide-react';
 import { useAuctionStore } from '../../stores/auction-store';
 import clsx from 'clsx';
 
 const NAV = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/campaigns', icon: Megaphone, label: 'Campaigns' },
-  { to: '/auction', icon: Radio, label: 'Live Auction' },
+  { to: '/', icon: LayoutDashboard, label: 'Dashboard', desc: 'Performance overview' },
+  { to: '/campaigns', icon: Megaphone, label: 'Campaigns', desc: 'Manage ad campaigns' },
+  { to: '/auction', icon: Radio, label: 'Live Auction', desc: 'Run simulations' },
 ];
 
 export default function Sidebar() {
@@ -14,15 +14,18 @@ export default function Sidebar() {
   const isRunning = simState?.status === 'running';
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-[220px] z-50 flex flex-col border-r border-white/[0.04] bg-void-50/80 backdrop-blur-xl">
+    <aside className="fixed left-0 top-0 bottom-0 w-[240px] z-50 flex flex-col border-r border-border bg-surface-1">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 h-16 border-b border-white/[0.04]">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-atrium-500 to-atrium-700 flex items-center justify-center shadow-lg shadow-atrium-500/20">
-          <Zap className="w-4 h-4 text-white" />
+      <div className="flex items-center gap-3 px-5 h-16 border-b border-border">
+        <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+          <Activity className="w-4 h-4 text-white" />
         </div>
-        <span className="font-display font-bold text-lg tracking-tight text-white">
-          atrium
-        </span>
+        <div>
+          <span className="font-display font-bold text-base text-txt-1 tracking-tight">
+            Atrium
+          </span>
+          <span className="block text-[10px] font-mono text-txt-3 -mt-0.5">Ad Auction Platform</span>
+        </div>
       </div>
 
       {/* Navigation */}
@@ -34,38 +37,41 @@ export default function Sidebar() {
             end={to === '/'}
             className={({ isActive }) =>
               clsx(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group',
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group cursor-pointer',
                 isActive
-                  ? 'bg-atrium-500/10 text-atrium-400 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.15)]'
-                  : 'text-gray-500 hover:text-gray-300 hover:bg-white/[0.03]'
+                  ? 'bg-accent-subtle text-accent border border-accent-border'
+                  : 'text-txt-2 hover:text-txt-1 hover:bg-surface-2 border border-transparent'
               )
             }
           >
-            <Icon className={clsx('w-4 h-4 transition-colors')} />
+            <Icon className="w-[18px] h-[18px]" />
             <span className="font-display">{label}</span>
             {to === '/auction' && isRunning && (
-              <span className="ml-auto w-2 h-2 rounded-full bg-neon-green animate-pulse-slow shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
+              <span className="ml-auto flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                <span className="text-[10px] font-mono text-success">LIVE</span>
+              </span>
             )}
           </NavLink>
         ))}
       </nav>
 
-      {/* Simulator status footer */}
-      <div className="px-4 py-4 border-t border-white/[0.04]">
-        <div className="flex items-center gap-2">
+      {/* Engine status */}
+      <div className="px-4 py-4 border-t border-border">
+        <div className="flex items-center gap-2.5">
           <div
             className={clsx(
-              'w-1.5 h-1.5 rounded-full transition-colors',
-              isRunning ? 'bg-neon-green shadow-[0_0_6px_rgba(16,185,129,0.5)]' : 'bg-gray-600'
+              'w-2 h-2 rounded-full transition-colors',
+              isRunning ? 'bg-success' : 'bg-txt-3'
             )}
           />
-          <span className="text-[11px] font-mono text-gray-500 uppercase tracking-widest">
-            {isRunning ? 'Engine Live' : 'Engine Idle'}
+          <span className="text-xs font-display font-medium text-txt-2">
+            {isRunning ? 'Engine Running' : 'Engine Idle'}
           </span>
         </div>
         {isRunning && simState && (
-          <div className="mt-2 text-[11px] font-mono text-gray-600">
-            {simState.stats.requestsPerSecond.toFixed(0)} req/s
+          <div className="mt-1.5 ml-[18px] text-xs font-mono text-txt-3">
+            {simState.stats.requestsPerSecond.toFixed(0)} req/s &middot; {simState.stats.totalRequests.toLocaleString()} processed
           </div>
         )}
       </div>

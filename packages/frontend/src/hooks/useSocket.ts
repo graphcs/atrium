@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuctionStore } from '../stores/auction-store';
 
+const BACKEND_URL = import.meta.env.VITE_API_URL || '';
+
 export function useSocket() {
   const socketRef = useRef<Socket | null>(null);
   const addBidResult = useAuctionStore((s) => s.addBidResult);
@@ -9,7 +11,7 @@ export function useSocket() {
   const setSimulatorState = useAuctionStore((s) => s.setSimulatorState);
 
   useEffect(() => {
-    const socket = io('/', { transports: ['websocket', 'polling'] });
+    const socket = io(BACKEND_URL || '/', { transports: ['websocket', 'polling'] });
     socketRef.current = socket;
 
     socket.on('bid_result', addBidResult);

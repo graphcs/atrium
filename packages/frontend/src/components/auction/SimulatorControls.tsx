@@ -18,25 +18,25 @@ export default function SimulatorControls() {
   const reset = () => { post('/simulator/reset'); clearBids(); };
 
   return (
-    <div className="glass-panel p-5 space-y-5 animate-fade-in">
+    <div className="card p-5 space-y-5 animate-fade-in">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-mono text-gray-500 tracking-[0.15em] uppercase">
-          Simulator Control
-        </span>
-        <div className={clsx(
-          'data-tag',
-          isRunning ? 'bg-neon-green/10 text-neon-green' : 'bg-gray-500/10 text-gray-500'
+        <span className="section-label">Simulator</span>
+        <span className={clsx(
+          'tag border',
+          isRunning
+            ? 'bg-success-subtle text-success border-success-border'
+            : 'bg-surface-2 text-txt-3 border-border'
         )}>
           {simState?.status ?? 'idle'}
-        </div>
+        </span>
       </div>
 
-      {/* Buttons */}
+      {/* Action buttons */}
       <div className="flex gap-2">
         <button
           onClick={start}
           disabled={isRunning}
-          className={clsx('btn-glow btn-glow-green flex-1 flex items-center justify-center gap-2', isRunning && 'opacity-40 cursor-not-allowed')}
+          className="btn-success flex-1"
         >
           <Play className="w-3.5 h-3.5" />
           Start
@@ -44,23 +44,24 @@ export default function SimulatorControls() {
         <button
           onClick={stop}
           disabled={!isRunning}
-          className={clsx('btn-glow btn-glow-red flex-1 flex items-center justify-center gap-2', !isRunning && 'opacity-40 cursor-not-allowed')}
+          className="btn-danger flex-1"
         >
           <Square className="w-3.5 h-3.5" />
           Stop
         </button>
         <button
           onClick={reset}
-          className="btn-glow btn-glow-neutral flex items-center justify-center gap-2 px-3"
+          className="btn-ghost px-3"
+          aria-label="Reset simulator"
         >
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      {/* Sliders */}
-      <div className="space-y-4">
+      {/* Configuration sliders */}
+      <div className="space-y-4 pt-1">
         <SliderField
-          label="Requests / sec"
+          label="Requests per second"
           value={rps}
           min={1}
           max={200}
@@ -68,7 +69,7 @@ export default function SimulatorControls() {
           display={`${rps}`}
         />
         <SliderField
-          label="Competitor Aggression"
+          label="Competitor aggressiveness"
           value={aggression}
           min={0}
           max={1}
@@ -90,8 +91,8 @@ function SliderField({
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[11px] font-mono text-gray-400">{label}</span>
-        <span className="text-[11px] font-mono text-atrium-400">{display}</span>
+        <span className="text-xs font-display text-txt-2">{label}</span>
+        <span className="text-xs font-mono font-semibold text-accent">{display}</span>
       </div>
       <input
         type="range"
@@ -100,11 +101,6 @@ function SliderField({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-1 bg-white/[0.06] rounded-full appearance-none cursor-pointer
-          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3
-          [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-atrium-500
-          [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(59,130,246,0.4)]
-          [&::-webkit-slider-thumb]:cursor-pointer"
       />
     </div>
   );

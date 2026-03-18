@@ -1,4 +1,4 @@
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useAuctionStore } from '../../stores/auction-store';
 
 export default function SpendChart() {
@@ -11,38 +11,45 @@ export default function SpendChart() {
   }));
 
   return (
-    <div className="glass-panel p-6 animate-fade-in">
-      <span className="text-[10px] font-mono text-gray-500 tracking-[0.15em] uppercase">
-        Win Rate Over Time
-      </span>
-      <div className="mt-4 h-[200px]">
+    <div className="card p-6 animate-fade-in h-full flex flex-col">
+      <span className="section-label">Performance Trend</span>
+      <div className="flex-1 mt-4 min-h-[200px]">
         {data.length < 2 ? (
-          <div className="flex items-center justify-center h-full text-gray-600 font-mono text-sm">
-            Waiting for data...
+          <div className="flex items-center justify-center h-full text-txt-3 font-display text-sm">
+            Waiting for auction data...
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+            <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id="winGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#5a8af2" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="#5a8af2" stopOpacity={0} />
                 </linearGradient>
               </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#252833"
+                vertical={false}
+              />
               <XAxis dataKey="idx" hide />
               <YAxis
                 domain={[0, 100]}
-                hide
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#5c5e6a', fontSize: 11, fontFamily: 'JetBrains Mono' }}
+                tickFormatter={(v) => `${v}%`}
+                width={45}
               />
               <Tooltip
                 contentStyle={{
-                  background: '#0d1224',
-                  border: '1px solid rgba(59,130,246,0.2)',
+                  background: '#1a1d27',
+                  border: '1px solid #252833',
                   borderRadius: '8px',
                   fontFamily: 'JetBrains Mono',
-                  fontSize: '11px',
-                  color: '#93c5fd',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                  fontSize: '12px',
+                  color: '#e4e5ea',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
                 }}
                 formatter={(value: number) => [`${value}%`, 'Win Rate']}
                 labelFormatter={() => ''}
@@ -50,7 +57,7 @@ export default function SpendChart() {
               <Area
                 type="monotone"
                 dataKey="winRate"
-                stroke="#3b82f6"
+                stroke="#5a8af2"
                 strokeWidth={2}
                 fill="url(#winGradient)"
                 dot={false}
