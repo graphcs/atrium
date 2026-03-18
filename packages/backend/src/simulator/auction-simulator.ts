@@ -49,6 +49,25 @@ export class AuctionSimulator extends EventEmitter {
     this.emit('state', this.getState());
   }
 
+  /** Update config while running (restarts the interval if RPS changed) */
+  updateConfig(config: Partial<SimulatorConfig>): void {
+    const oldRps = this.config.requestsPerSecond;
+    this.config = { ...this.config, ...config };
+
+    // If RPS changed and we're running, restart the interval at the new rate
+    if (this.status === 'running' && config.requestsPerSecond && config.requestsPerSecond !== oldRps) {
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
+      const intervalMs = Math.max(10, Math.floor(1000 / this.config.requestsPerSecond));
+      this.intervalId = setInterval(() => {
+        this.tick();
+      }, intervalMs);
+    }
+
+    this.emit('state', this.getState());
+  }
+
   stop(): void {
     if (this.intervalId) {
       clearInterval(this.intervalId);

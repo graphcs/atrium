@@ -5,7 +5,7 @@ import { useAuctionStore } from '../../stores/auction-store';
 import clsx from 'clsx';
 
 export default function SimulatorControls() {
-  const { post } = useApi();
+  const { post, patch } = useApi();
   const simState = useAuctionStore((s) => s.simulatorState);
   const clearBids = useAuctionStore((s) => s.clearBids);
   const isRunning = simState?.status === 'running';
@@ -16,6 +16,16 @@ export default function SimulatorControls() {
   const start = () => post('/simulator/start', { requestsPerSecond: rps, competitorAggressiveness: aggression });
   const stop = () => post('/simulator/stop');
   const reset = () => { post('/simulator/reset'); clearBids(); };
+
+  // Live-update config while simulator is running
+  const updateRps = (v: number) => {
+    setRps(v);
+    if (isRunning) patch('/simulator/config', { requestsPerSecond: v });
+  };
+  const updateAggression = (v: number) => {
+    setAggression(v);
+    if (isRunning) patch('/simulator/config', { competitorAggressiveness: v });
+  };
 
   return (
     <div className="card p-5 space-y-5 animate-fade-in">
@@ -65,7 +75,7 @@ export default function SimulatorControls() {
           value={rps}
           min={1}
           max={200}
-          onChange={setRps}
+          onChange={updateRps}
           display={`${rps}`}
         />
         <SliderField
@@ -74,7 +84,7 @@ export default function SimulatorControls() {
           min={0}
           max={1}
           step={0.05}
-          onChange={setAggression}
+          onChange={updateAggression}
           display={`${(aggression * 100).toFixed(0)}%`}
         />
       </div>

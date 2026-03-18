@@ -19,6 +19,12 @@ export function createSimulatorRoutes(simulator: AuctionSimulator) {
       return simulator.getState();
     });
 
+    app.patch('/api/simulator/config', async (req) => {
+      const config = req.body as any;
+      simulator.updateConfig(config);
+      return simulator.getState();
+    });
+
     app.get('/api/simulator/state', async () => {
       return simulator.getState();
     });
