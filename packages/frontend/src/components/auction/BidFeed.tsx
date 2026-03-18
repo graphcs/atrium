@@ -4,15 +4,18 @@ import { Pause } from 'lucide-react';
 import clsx from 'clsx';
 
 export default function BidFeed() {
-  const bids = useAuctionStore((s) => s.recentBids);
+  const liveBids = useAuctionStore((s) => s.recentBids);
   const containerRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
+  const [frozenBids, setFrozenBids] = useState(liveBids);
+
+  const bids = paused ? frozenBids : liveBids;
 
   useEffect(() => {
     if (!paused && containerRef.current) {
       containerRef.current.scrollTop = 0;
     }
-  }, [bids, paused]);
+  }, [liveBids, paused]);
 
   return (
     <div className="card flex flex-col h-full animate-fade-in relative">
@@ -37,7 +40,7 @@ export default function BidFeed() {
       {/* Feed */}
       <div
         ref={containerRef}
-        onMouseEnter={() => setPaused(true)}
+        onMouseEnter={() => { setFrozenBids(liveBids); setPaused(true); }}
         onMouseLeave={() => setPaused(false)}
         className="flex-1 overflow-y-auto min-h-0"
       >
