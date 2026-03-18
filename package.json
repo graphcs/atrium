@@ -1,6 +1,7 @@
 {
   "name": "atrium",
   "private": true,
+  "packageManager": "pnpm@10.18.2",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
