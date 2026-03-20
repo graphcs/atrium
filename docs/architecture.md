@@ -161,6 +161,76 @@ Bid Request ─► [FILTER] ─► [SCORE] ─► [PRICE] ─► [PACE] ─► B
 - If near budget exhaustion (>90% spent): hard throttle to 30%
 - Rate limiting: cap bids per second to prevent runaway spending
 
+#### Bid shading
+
+  Bid Shading — The Math
+
+  The core idea: in a first-price auction (which is the industry standard now), you pay exactly what
+  you bid. So if you bid $8 and the next-highest bid was $3.50, you just overpaid by $4.50. Bid shading
+   means: bid closer to $3.50, not $8.
+
+  The Formula
+
+  Here's what our bid pricer calculates, step by step:
+
+  bidPrice = estimatedClearingPrice × shadingFactor × probabilityAdjustment
+
+  Step 1 — Estimate the clearing price:
+
+  If we have < 10 past auctions of data:
+      estimatedClearing = floorPrice × 1.8      (aggressive guess while learning)
+
+  If we have >= 10 past auctions:
+      estimatedClearing = movingAverage(last 100 clearing prices)
+      estimatedClearing = max(estimatedClearing, floorPrice × 1.1)
+
+  Step 2 — Apply shading factor (0.92):
+
+  shadedPrice = estimatedClearing × 0.92
+
+  We bid at 92% of what we think the clearing price is — just under, banking on winning at a slight
+  discount.
+
+  Step 3 — Adjust for win probability:
+
+  probabilityAdjustment = 1 + (0.5 - winProbability) × 0.4
+
+  This is the clever part:
+  - If winProbability = 0.8 (very likely to win): adjustment = 1 + (0.5 - 0.8) × 0.4 = 0.88 → bid lower
+   (why overpay when we'll probably win?)
+  - If winProbability = 0.3 (borderline): adjustment = 1 + (0.5 - 0.3) × 0.4 = 1.08 → bid higher (need
+  to be more competitive)
+  - If winProbability = 0.5 (coin flip): adjustment = 1.0 → no change
+
+  Step 4 — Enforce constraints:
+
+  bidPrice = max(bidPrice, floorPrice × 1.01)     // at least 1% above floor
+  bidPrice = min(bidPrice, maxBidCpm)               // never exceed campaign max
+  bidPrice = min(bidPrice, floorPrice × 3.0)        // never bid more than 3x floor
+
+  Concrete Example
+
+  Say a bid request comes in from KueezRTB:
+  - Floor price: $2.50 CPM
+  - Our campaign max bid: $8.00 CPM
+  - Win probability score: 0.65 (we're likely to win this)
+  - We have enough history, moving average of clearing prices: $4.00
+
+  estimatedClearing = max($4.00, $2.50 × 1.1) = $4.00
+  shadedPrice       = $4.00 × 0.92 = $3.68
+  probAdjustment    = 1 + (0.5 - 0.65) × 0.4 = 0.94
+  bidPrice          = $3.68 × 0.94 = $3.46
+
+  Constraints:
+    max($3.46, $2.50 × 1.01) = $3.46  ✓ (above floor)
+    min($3.46, $8.00) = $3.46          ✓ (under max)
+    min($3.46, $2.50 × 3.0) = $3.46   ✓ (under 3x floor)
+
+  Final bid: $3.46 CPM
+
+  Without shading, we'd bid $8.00 and overpay by $4.54 per win. Bid shading saves us 57% per
+  impression.
+
 ---
 
 ## 4. Reseller Integration
